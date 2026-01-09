@@ -1,0 +1,20 @@
+# STEM Catalyst Backend - Requirements
+# =====================================
+
+# Core Flask Framework
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# Environment & Configuration
+python-dotenv>=1.0.0
+
+# HTTP Requests (for NVIDIA API calls)
+requests>=2.31.0
+
+# Voice Processing (AssemblyAI)
+assemblyai>=0.20.0
+
+# Image Generation (Pollinations - uses requests, no extra deps)
+# Note: Pollinations API is called via requests, no special package needed
+
+# Logging (built-in, no extra deps)

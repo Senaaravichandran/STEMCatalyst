@@ -1,0 +1,40 @@
+# STEM Catalyst - Full Project Requirements
+# ==========================================
+# Install with: pip install -r requirements.txt
+
+# ===================
+# Core Flask Framework
+# ===================
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# ===================
+# Environment & Config
+# ===================
+python-dotenv>=1.0.0
+
+# ===================
+# HTTP Requests
+# ===================
+requests>=2.31.0
+
+# ===================
+# AI Services
+# ===================
+# OpenAI SDK (used for NVIDIA Nemotron API)
+openai>=1.0.0
+
+# AssemblyAI (Voice-to-Text)
+assemblyai>=0.20.0
+
+# ===================
+# Data Processing
+# ===================
+pandas>=2.0.0
+numpy>=1.24.0
+
+# ===================
+# Note: The following are built-in Python modules (no install needed):
+# - os, sys, json, logging, time, re, base64, hashlib
+# - typing, datetime, functools, io, difflib, urllib.parse
+# ===================
