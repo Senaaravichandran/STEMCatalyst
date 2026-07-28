@@ -30,11 +30,12 @@ def create_app():
     logger = logging.getLogger(__name__)
     
     # Enable CORS with production-ready configuration
+    import re
     allowed_origins = [
         'http://localhost:3000',
         'https://stem-catalyst.vercel.app',
-        'https://stem-catalyst-*.vercel.app',
-        'https://*.onrender.com'
+        re.compile(r'https://stem-catalyst-.*\.vercel\.app'),
+        re.compile(r'https://.*\.onrender\.com')
     ]
     
     # Add Render domain if available
