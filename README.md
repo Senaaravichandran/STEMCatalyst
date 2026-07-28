@@ -90,7 +90,7 @@ Full dark mode support with smooth transitions. Persists your preference across 
 - **Python** 3.8+
 - **Node.js** 16+
 - **npm** or **yarn**
-- **Together.ai API Key** — [Get one free at console.groq.com](https://console.groq.com)
+- **Together.ai API Key** — [Get one free at api.together.ai](https://api.together.ai/)
 - **AssemblyAI API Key** — [Get one free at assemblyai.com](https://www.assemblyai.com)
 
 ### Installation
