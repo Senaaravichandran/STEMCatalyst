@@ -174,7 +174,7 @@ const VoiceView = () => {
             </h1>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Speak your STEM problems and get AI-powered solutions powered by NVIDIA Nemotron
+            Speak your STEM problems and get AI-powered solutions powered by Together.ai
           </p>
         </div>
 

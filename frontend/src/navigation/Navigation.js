@@ -205,7 +205,7 @@ const Navigation = ({ currentView, onViewChange, darkMode, onToggleDarkMode }) =
                 <Brain className="h-4 w-4 text-white" />
               </div>
               <div>
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Powered by NVIDIA Nemotron</span>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Powered by Together.ai</span>
                 <div className="flex items-center space-x-1">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                   <span className="text-xs text-slate-500 dark:text-slate-400">Online</span>

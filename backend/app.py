@@ -4,8 +4,6 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import logging
 from datetime import datetime
-import json
-import hashlib
 import time
 
 from api.routes import api_bp
@@ -21,11 +19,10 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
-    app.config['NVIDIA_API_KEY'] = os.getenv('NVIDIA_API_KEY')
-    app.config['HUGGINGFACE_TOKEN'] = os.getenv('HUGGINGFACE_TOKEN')
+    app.config['GROQ_API_KEY'] = os.getenv('GROQ_API_KEY')
     app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
-    # Configure logging first (before using logger)
+    # Configure logging
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -33,16 +30,17 @@ def create_app():
     logger = logging.getLogger(__name__)
     
     # Enable CORS with production-ready configuration
-    allowed_origins = ['http://localhost:3000', 'https://stem-catalyst.vercel.app', 'https://stem-catalyst-*.vercel.app']
+    allowed_origins = [
+        'http://localhost:3000',
+        'https://stem-catalyst.vercel.app',
+        'https://stem-catalyst-*.vercel.app',
+        'https://*.onrender.com'
+    ]
     
-    # Add production domain if we're not in development
-    if not app.config['DEBUG']:
-        vercel_domain = os.getenv('VERCEL_URL')
-        if vercel_domain:
-            allowed_origins.extend([
-                f'https://{vercel_domain}',
-                f'https://*.vercel.app'
-            ])
+    # Add Render domain if available
+    render_url = os.getenv('RENDER_EXTERNAL_URL')
+    if render_url:
+        allowed_origins.append(render_url)
     
     CORS(app, origins=allowed_origins, 
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -56,7 +54,7 @@ def create_app():
         if request.is_json:
             logger.info(f"Request data: {request.get_json()}")
     
-    # Register blueprints - Remove /api prefix since Vercel handles it
+    # Register blueprints
     app.register_blueprint(api_bp)
     
     # Initialize services
@@ -72,10 +70,11 @@ def create_app():
         logger.error(f"Failed to initialize voice service: {e}")
         app.voice_service = None
     
-    # Health check endpoint (single, enhanced version)
+    # Health check endpoint
     @app.route('/health')
+    @app.route('/api/health')
     def health_check():
-        """Enhanced health check endpoint with performance metrics"""
+        """Health check endpoint with service status"""
         start_time = time.time()
         
         services_status = {}
@@ -85,6 +84,7 @@ def create_app():
             ai_health = app.ai_service.health_check()
             services_status['ai_service'] = {
                 "status": "healthy" if ai_health['overall_status'] else "degraded",
+                "provider": "Together.ai",
                 "details": ai_health
             }
         except Exception as e:
@@ -106,15 +106,16 @@ def create_app():
         except Exception as e:
             services_status['data_service'] = {"status": "error", "error": str(e)}
         
-        response_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+        response_time = (time.time() - start_time) * 1000
         
         return jsonify({
             "status": "healthy",
             "message": "STEM Catalyst API is online",
             "timestamp": datetime.now().isoformat(),
-            "version": "2.1.0",
+            "version": "3.0.0",
             "response_time_ms": round(response_time, 2),
             "services": services_status,
+            "ai_provider": "Together.ai",
             "environment": {
                 "python_version": f"{os.sys.version_info.major}.{os.sys.version_info.minor}.{os.sys.version_info.micro}",
                 "flask_debug": app.config.get('DEBUG', False)
@@ -128,6 +129,7 @@ def create_app():
             health_status = app.ai_service.health_check()
             return jsonify({
                 "status": "healthy" if health_status['overall_status'] else "degraded",
+                "provider": "Together.ai",
                 "services": health_status,
                 "timestamp": datetime.now().isoformat()
             }), 200 if health_status['overall_status'] else 503
@@ -159,7 +161,7 @@ def create_app():
     
     return app
 
-# For Vercel serverless deployment
+# For deployment (Render / Vercel)
 app = create_app()
 
 if __name__ == '__main__':

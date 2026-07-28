@@ -41,7 +41,7 @@ const HomeView = ({ onViewChange }) => {
     {
       id: 'solver',
       title: 'Problem Solver',
-      description: 'Get step-by-step solutions to complex STEM problems with detailed explanations powered by NVIDIA Nemotron.',
+      description: 'Get step-by-step solutions to complex STEM problems with detailed explanations powered by Together.ai.',
       icon: Brain,
       gradient: 'from-blue-500 to-indigo-600',
       shadowColor: 'shadow-blue-500/25',
@@ -293,7 +293,7 @@ const HomeView = ({ onViewChange }) => {
                 <Rocket className="w-5 h-5 text-white" />
               </div>
               <div className="text-left">
-                <div className="text-sm font-bold text-slate-800 dark:text-slate-200">NVIDIA Nemotron</div>
+                <div className="text-sm font-bold text-slate-800 dark:text-slate-200">Together.ai</div>
                 <div className="text-xs text-slate-400 dark:text-slate-500">Problem Solving</div>
               </div>
             </div>

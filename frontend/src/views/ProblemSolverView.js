@@ -272,7 +272,7 @@ const ProblemSolverView = () => {
                       <Award className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="font-semibold text-gray-800">Expert Quality</h3>
-                    <p className="text-xs text-gray-500 mt-1">Powered by NVIDIA Nemotron</p>
+                    <p className="text-xs text-gray-500 mt-1">Powered by Together.ai</p>
                   </div>
                 </div>
               </div>

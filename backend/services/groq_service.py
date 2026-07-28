@@ -6,27 +6,26 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-class NvidiaLlamaService:
-    """NVIDIA Llama 4 Scout service for STEM problem solving and concept explanation"""
+class GroqService:
+    """Groq API service for STEM problem solving, concept explanation, formulas, and study tips.
+    Displayed as 'Together.ai' in the UI."""
     
     def __init__(self):
-        # Load API key from environment variable
-        self.api_key = os.getenv('NVIDIA_API_KEY')
+        self.api_key = os.getenv('GROQ_API_KEY')
         if not self.api_key:
-            logger.warning("NVIDIA_API_KEY not found in environment variables")
-            raise ValueError("NVIDIA_API_KEY environment variable is required")
+            logger.warning("GROQ_API_KEY not found in environment variables")
+            raise ValueError("GROQ_API_KEY environment variable is required")
         
-        self.invoke_url = os.getenv('NVIDIA_API_URL', 'https://integrate.api.nvidia.com/v1/chat/completions')
-        self.model = "meta/llama-4-scout-17b-16e-instruct"
-        logger.info("NVIDIA Llama service initialized with API key from environment")
+        self.api_url = "https://api.groq.com/openai/v1/chat/completions"
+        self.model = "llama-3.3-70b-versatile"
+        logger.info("Groq service initialized (Together.ai branding)")
     
     def _make_request(self, messages: list, max_tokens: int = 4000, 
-                     temperature: float = 0.7, stream: bool = False) -> str:
-        """Make request to NVIDIA API"""
+                     temperature: float = 0.7) -> str:
+        """Make request to Groq API"""
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "Accept": "text/event-stream" if stream else "application/json"
+            "Content-Type": "application/json"
         }
         
         payload = {
@@ -34,48 +33,27 @@ class NvidiaLlamaService:
             "messages": messages,
             "max_tokens": max_tokens,
             "temperature": temperature,
-            "top_p": 1.00,
-            "frequency_penalty": 0.00,
-            "presence_penalty": 0.00,
-            "stream": stream
+            "top_p": 1.0,
+            "frequency_penalty": 0.0,
+            "presence_penalty": 0.0,
+            "stream": False
         }
         
         try:
-            response = requests.post(self.invoke_url, headers=headers, json=payload, timeout=120)
-            
-            if stream:
-                # Handle streaming response
-                full_content = ""
-                for line in response.iter_lines():
-                    if line:
-                        line_text = line.decode("utf-8")
-                        if line_text.startswith("data: "):
-                            data_str = line_text[6:]
-                            if data_str.strip() == "[DONE]":
-                                break
-                            try:
-                                data = json.loads(data_str)
-                                if "choices" in data and len(data["choices"]) > 0:
-                                    delta = data["choices"][0].get("delta", {})
-                                    content = delta.get("content", "")
-                                    full_content += content
-                            except json.JSONDecodeError:
-                                continue
-                return full_content
-            else:
-                # Handle non-streaming response
-                response.raise_for_status()
-                data = response.json()
-                return data["choices"][0]["message"]["content"]
-                
+            response = requests.post(self.api_url, headers=headers, json=payload, timeout=120)
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"]
         except requests.exceptions.RequestException as e:
-            logger.error(f"NVIDIA API request failed: {str(e)}")
-            raise Exception(f"NVIDIA API request failed: {str(e)}")
+            logger.error(f"Groq API request failed: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response body: {e.response.text}")
+            raise Exception(f"AI API request failed: {str(e)}")
     
     def solve_problem(self, problem: str, subject: str, difficulty: str,
                      show_steps: bool = True, include_theory: bool = True,
                      include_diagrams: bool = True, temperature: float = 0.7) -> Dict[str, Any]:
-        """Solve a STEM problem using NVIDIA Llama"""
+        """Solve a STEM problem"""
         
         system_message = f"""You are a world-class {subject} professor with decades of teaching experience. 
 You excel at breaking down complex problems into understandable steps and explaining concepts clearly 
@@ -85,7 +63,6 @@ and always focused on helping students truly understand both the solution proces
 CRITICAL INSTRUCTION - SUBJECT RESTRICTION:
 You MUST ONLY answer questions related to {subject}. 
 - If the user asks about a topic outside of {subject}, politely decline and say: "I'm currently set to help with {subject} questions only. Please change the subject selector if you'd like help with a different topic."
-- Do NOT provide answers, hints, or information about other subjects like {'Mathematics, Physics, Chemistry, or General Science' if subject == 'Biology' else 'Biology, Physics, Chemistry, or General Science' if subject == 'Mathematics' else 'Biology, Mathematics, Chemistry, or General Science' if subject == 'Physics' else 'Biology, Mathematics, Physics, or General Science' if subject == 'Chemistry' else 'Biology, Mathematics, Physics, or Chemistry'}.
 - Stay strictly within the domain of {subject}."""
 
         user_prompt = f"""You are an expert STEM educator and problem solver specializing ONLY in {subject}. 
@@ -127,12 +104,12 @@ Please provide a comprehensive solution that helps the student both solve this s
         ]
         
         try:
-            logger.info(f"Solving problem with NVIDIA Llama: {problem[:50]}...")
+            logger.info(f"Solving problem: {problem[:50]}...")
             solution = self._make_request(messages, temperature=temperature)
             
             return {
                 "solution": solution,
-                "model_used": "NVIDIA Llama 4 Scout",
+                "model_used": "Together.ai",
                 "model_version": self.model,
                 "success": True,
                 "confidence": "high",
@@ -145,13 +122,13 @@ Please provide a comprehensive solution that helps the student both solve this s
                 }
             }
         except Exception as e:
-            logger.error(f"Error solving problem with NVIDIA Llama: {str(e)}")
+            logger.error(f"Error solving problem: {str(e)}")
             raise
     
     def explain_concept(self, concept: str, subject: str = "General", 
                        level: str = "intermediate", include_examples: bool = True,
                        include_history: bool = False, temperature: float = 0.7) -> str:
-        """Explain a concept using NVIDIA Llama"""
+        """Explain a concept"""
         
         system_message = f"""You are an expert {subject} educator with a gift for explaining complex concepts 
 in simple, understandable terms. You adapt your explanations to the student's level and always provide 
@@ -166,9 +143,6 @@ You MUST ONLY explain concepts related to {subject}.
         user_prompt = f"""Please explain the concept of '{concept}' - but ONLY if it relates to {subject}.
 
 IMPORTANT: You must ONLY explain concepts about {subject}. If '{concept}' is not related to {subject}, politely decline and ask the user to change their subject selection.
-
-FIRST: Determine if '{concept}' is a {subject} concept. If NOT, respond with:
-"The concept '{concept}' appears to be related to [detected subject], but I'm currently set to help with {subject} only. Please select the appropriate subject from the options panel to learn about this topic."
 
 IF THE CONCEPT IS ABOUT {subject.upper()}, PROVIDE:
 
@@ -194,22 +168,73 @@ Use clear markdown formatting and make the explanation engaging and educational.
         ]
         
         try:
-            logger.info(f"Explaining concept with NVIDIA Llama: {concept}")
+            logger.info(f"Explaining concept: {concept}")
             explanation = self._make_request(messages, temperature=temperature, max_tokens=3000)
             return explanation
         except Exception as e:
-            logger.error(f"Error explaining concept with NVIDIA Llama: {str(e)}")
+            logger.error(f"Error explaining concept: {str(e)}")
+            raise
+    
+    def get_formulas(self, subject: str, topic: str = "", search_term: str = "",
+                    temperature: float = 0.3) -> str:
+        """Get formulas for a subject/topic"""
+        
+        system_message = f"""You are an expert {subject} educator specializing in formulas, equations, and mathematical expressions.
+Your role is to provide comprehensive, well-organized formula references that help students understand and apply key equations.
+
+Focus on providing:
+1. Clear formula notation with proper mathematical symbols
+2. Variable definitions and units
+3. When and how to use each formula
+4. Common variations and special cases"""
+
+        user_prompt = f"""Please provide a comprehensive formula reference for {subject}"""
+        if topic:
+            user_prompt += f", specifically focusing on {topic}"
+        if search_term:
+            user_prompt += f", with emphasis on formulas related to '{search_term}'"
+        
+        user_prompt += """.
+
+For each formula, please include:
+1. **Formula Name**: Clear title
+2. **Formula**: The mathematical expression with proper notation
+3. **Variables**: Define each variable with units
+4. **Application**: When to use this formula
+5. **Example**: A brief example of how to apply it
+
+Use clear markdown formatting with proper headers and organize formulas logically.
+Include at least 5-8 relevant formulas for this topic."""
+
+        messages = [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        try:
+            logger.info(f"Getting formulas for {subject} - {topic}")
+            formulas = self._make_request(messages, temperature=temperature, max_tokens=3000)
+            return formulas
+        except Exception as e:
+            logger.error(f"Error getting formulas: {str(e)}")
             raise
     
     def get_study_tips(self, subject: str, learning_style: str = "Visual",
                       study_goal: str = "General Understanding", 
-                      challenges: list = None, temperature: float = 0.7) -> str:
-        """Get personalized study tips using NVIDIA Llama"""
+                      challenges: list = None, temperature: float = 0.6) -> str:
+        """Get personalized study tips"""
         
         challenges_text = ", ".join(challenges) if challenges else "general learning"
         
         system_message = """You are an expert learning coach and educational psychologist who specializes 
-in helping students develop effective study strategies tailored to their individual needs and learning styles."""
+in helping students develop effective study strategies tailored to their individual needs and learning styles.
+
+You have deep knowledge of:
+- Cognitive science and memory techniques
+- Different learning styles (Visual, Auditory, Reading/Writing, Kinesthetic)
+- Time management and productivity strategies
+- Test preparation and anxiety management
+- Subject-specific study approaches"""
 
         user_prompt = f"""Please provide personalized study tips for a student with these characteristics:
 
@@ -220,14 +245,18 @@ STUDENT PROFILE:
 - Challenges: {challenges_text}
 
 Provide comprehensive, actionable study tips that include:
-1. **Study Strategies**: Specific techniques suited to their learning style
-2. **Time Management**: How to structure study sessions
-3. **Resource Recommendations**: Types of resources that work best
-4. **Practice Methods**: Effective ways to practice and retain information
-5. **Overcoming Challenges**: Specific advice for their stated challenges
-6. **Motivation Tips**: How to stay motivated and engaged
 
-Make the tips practical, specific, and easy to implement."""
+1. **Study Strategies**: Specific techniques suited to their {learning_style} learning style for {subject}
+2. **Time Management**: How to structure study sessions effectively
+3. **Resource Recommendations**: Types of resources that work best for this learning style
+4. **Practice Methods**: Effective ways to practice and retain {subject} information
+5. **Overcoming Challenges**: Specific advice for: {challenges_text}
+6. **Motivation Tips**: How to stay motivated and engaged
+7. **Memory Techniques**: Specific memorization strategies for {subject}
+8. **Study Schedule**: A suggested weekly study plan
+
+Make the tips practical, specific to {subject}, and easy to implement.
+Use clear markdown formatting with headers and bullet points."""
 
         messages = [
             {"role": "system", "content": system_message},
@@ -235,26 +264,28 @@ Make the tips practical, specific, and easy to implement."""
         ]
         
         try:
-            logger.info(f"Getting study tips with NVIDIA Llama for {subject}")
-            tips = self._make_request(messages, temperature=temperature, max_tokens=2000)
+            logger.info(f"Getting study tips for {subject} - {learning_style}")
+            tips = self._make_request(messages, temperature=temperature, max_tokens=3000)
             return tips
         except Exception as e:
-            logger.error(f"Error getting study tips with NVIDIA Llama: {str(e)}")
+            logger.error(f"Error getting study tips: {str(e)}")
             raise
     
     def health_check(self) -> Dict[str, Any]:
-        """Check if NVIDIA Llama service is available"""
+        """Check if AI service is available"""
         try:
             messages = [{"role": "user", "content": "Hello"}]
-            response = self._make_request(messages, max_tokens=10, temperature=0.1)
+            self._make_request(messages, max_tokens=10, temperature=0.1)
             return {
                 "available": True,
                 "model": self.model,
+                "provider": "Together.ai",
                 "error": None
             }
         except Exception as e:
             return {
                 "available": False,
                 "model": self.model,
+                "provider": "Together.ai",
                 "error": str(e)
             }
