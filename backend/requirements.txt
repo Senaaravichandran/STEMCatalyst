@@ -15,5 +15,6 @@ requests>=2.31.0
 # Voice Processing (AssemblyAI)
 assemblyai>=0.20.0
 
-# Image Generation (Pollinations - uses requests, no extra deps)
-# Note: Pollinations API is called via requests, no special package needed
+# Data Science & Processing
+pandas>=2.0.0
+numpy>=1.24.0
