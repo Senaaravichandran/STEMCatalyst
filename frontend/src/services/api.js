@@ -1,6 +1,22 @@
 import axios from 'axios';
 
-const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/api';
+// Use environment variable or detect if we're on Vercel
+const getApiBaseUrl = () => {
+  // If REACT_APP_API_URL is set, use it
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL + '/api';
+  }
+  
+  // If we're in production (deployed), use relative path
+  if (process.env.NODE_ENV === 'production') {
+    return '/api';
+  }
+  
+  // Default to localhost for development
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -104,7 +120,7 @@ export const ApiService = {
   // Health check
   async healthCheck() {
     try {
-      const healthUrl = (process.env.REACT_APP_API_URL || 'http://localhost:5000') + '/health';
+      const healthUrl = API_BASE_URL + '/health';
       const response = await axios.get(healthUrl);
       return response.data;
     } catch (error) {

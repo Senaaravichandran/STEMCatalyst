@@ -22,7 +22,7 @@ def solve_problem():
         "includeTheory": true|false,
         "includeDiagrams": true|false,
         "temperature": 0.2,
-        "model": "mistral|deepseek" (optional, defaults to mistral)
+        "model": "llama|nemotron" (optional, defaults to llama)
     }
     """
     try:
@@ -49,7 +49,7 @@ def solve_problem():
         include_theory = data.get('includeTheory', True)
         include_diagrams = data.get('includeDiagrams', True)
         temperature = data.get('temperature', 0.2)
-        preferred_model = data.get('model', 'mistral')
+        preferred_model = data.get('model', 'llama')
         
         logger.info(f"Processing {difficulty} {subject} problem")
         
@@ -184,7 +184,7 @@ def ai_health_check():
 @api_bp.route('/explain', methods=['POST'])
 def explain_concept():
     """
-    Explain a STEM concept using Mistral AI
+    Explain a STEM concept using NVIDIA AI
     
     Expected JSON payload:
     {
@@ -275,7 +275,7 @@ def explain_concept():
 @api_bp.route('/formulas', methods=['POST'])
 def get_formulas():
     """
-    Get formula reference using Mistral AI
+    Get formula reference using NVIDIA Nemotron AI
     
     Expected JSON payload:
     {
@@ -397,7 +397,7 @@ def health_check_ai():
 @api_bp.route('/study-tips', methods=['POST'])
 def get_study_tips():
     """
-    Get personalized study tips using Mistral AI
+    Get personalized study tips using NVIDIA Nemotron AI
     
     Expected JSON payload:
     {

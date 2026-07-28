@@ -21,14 +21,33 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
-    app.config['MISTRAL_API_KEY'] = os.getenv('MISTRAL_API_KEY', '3BstpDMkoMclOAZyqdI6lNHQlTLo127I')
+    app.config['NVIDIA_API_KEY'] = os.getenv('NVIDIA_API_KEY')
     app.config['HUGGINGFACE_TOKEN'] = os.getenv('HUGGINGFACE_TOKEN')
-    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
+    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
-    # Enable CORS with detailed configuration
-    CORS(app, origins=['http://localhost:3000'], 
+    # Configure logging first (before using logger)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    logger = logging.getLogger(__name__)
+    
+    # Enable CORS with production-ready configuration
+    allowed_origins = ['http://localhost:3000', 'https://stem-catalyst.vercel.app', 'https://stem-catalyst-*.vercel.app']
+    
+    # Add production domain if we're not in development
+    if not app.config['DEBUG']:
+        vercel_domain = os.getenv('VERCEL_URL')
+        if vercel_domain:
+            allowed_origins.extend([
+                f'https://{vercel_domain}',
+                f'https://*.vercel.app'
+            ])
+    
+    CORS(app, origins=allowed_origins, 
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-         allow_headers=['Content-Type', 'Authorization'])
+         allow_headers=['Content-Type', 'Authorization'],
+         supports_credentials=True)
     
     # Add request logging
     @app.before_request
@@ -37,15 +56,8 @@ def create_app():
         if request.is_json:
             logger.info(f"Request data: {request.get_json()}")
     
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    logger = logging.getLogger(__name__)
-    
-    # Register blueprints
-    app.register_blueprint(api_bp, url_prefix='/api')
+    # Register blueprints - Remove /api prefix since Vercel handles it
+    app.register_blueprint(api_bp)
     
     # Initialize services
     app.ai_service = AIService()
@@ -60,7 +72,7 @@ def create_app():
         logger.error(f"Failed to initialize voice service: {e}")
         app.voice_service = None
     
-    # Health check endpoints
+    # Health check endpoint (single, enhanced version)
     @app.route('/health')
     def health_check():
         """Enhanced health check endpoint with performance metrics"""
@@ -98,8 +110,9 @@ def create_app():
         
         return jsonify({
             "status": "healthy",
+            "message": "STEM Catalyst API is online",
             "timestamp": datetime.now().isoformat(),
-            "version": "2.0.0",
+            "version": "2.1.0",
             "response_time_ms": round(response_time, 2),
             "services": services_status,
             "environment": {
@@ -145,27 +158,11 @@ def create_app():
         }), 500
     
     return app
-    
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
-    
-    @app.errorhandler(500)
-    def internal_error(error):
-        return jsonify({'error': 'Internal server error'}), 500
-    
-    @app.route('/health')
-    def health_check():
-        return jsonify({
-            'status': 'healthy',
-            'timestamp': datetime.now().isoformat(),
-            'version': '1.0.0'
-        })
-    
-    return app
+
+# For Vercel serverless deployment
+app = create_app()
 
 if __name__ == '__main__':
-    app = create_app()
     app.run(
         host='0.0.0.0',
         port=int(os.getenv('PORT', 5000)),

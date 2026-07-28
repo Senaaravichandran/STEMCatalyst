@@ -17,4 +17,4 @@ assemblyai>=0.20.0
 # Image Generation (Pollinations - uses requests, no extra deps)
 # Note: Pollinations API is called via requests, no special package needed
 
-# Logging (built-in, no extra deps)
+# NVIDIA AI API (uses requests, no extra package needed)
