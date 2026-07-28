@@ -106,7 +106,8 @@ Full dark mode support with smooth transitions. Persists your preference across 
    Create a `.env` file in the `backend/` folder:
    ```env
    # Together.ai API Key (Llama 3.3 70B)
-   GROQ_API_KEY=your_groq_api_key_here
+   # Get it from: https://api.together.ai/
+   GROQ_API_KEY=your_together_ai_api_key_here
 
    # AssemblyAI (voice-to-text)
    ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here
@@ -164,9 +165,9 @@ STEMCatalyst is configured for **one-click deployment** on [Render](https://rend
 4. Add **Environment Variables**:
    | Key | Value |
    |-----|-------|
-   | `GROQ_API_KEY` | Your Together.ai API key |
+   | `GROQ_API_KEY` | Your Together.ai API key (obtained from https://api.together.ai/) |
    | `ASSEMBLYAI_API_KEY` | Your AssemblyAI key |
-   | `SECRET_KEY` | Any random string |
+   | `SECRET_KEY` | Any random strong string |
    | `FLASK_DEBUG` | `False` |
 5. Click **Create Web Service** — your API will be live at `https://your-app.onrender.com`
 

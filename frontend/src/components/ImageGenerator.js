@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Palette, BookOpen, Eye, Bot, RefreshCw, XCircle, CheckCircle, Search, Download, ZoomIn, ZoomOut, Image as ImageIcon } from 'lucide-react';
 import './ImageGenerator.css';
 
 const ImageGenerator = () => {
@@ -176,7 +177,6 @@ const ImageGenerator = () => {
       
       // Pre-load image to ensure it's generated before showing
       const img = new Image();
-      img.crossOrigin = 'anonymous';
       img.onload = () => {
         setResult({
           success: true,
@@ -369,28 +369,28 @@ const ImageGenerator = () => {
   return (
     <div className="image-generator">
       <div className="header">
-        <h2>🎨 AI Image Generator & Analyzer</h2>
+        <h2 className="flex items-center gap-2"><Palette className="w-6 h-6 text-blue-500" /> AI Image Generator & Analyzer</h2>
         <p>Powered by Pollinations AI with multiple models (Flux, DALL-E, Turbo & more)</p>
       </div>
 
       <div className="tabs">
         <button 
-          className={activeTab === 'generate' ? 'active' : ''} 
+          className={`flex items-center gap-2 ${activeTab === 'generate' ? 'active' : ''}`}
           onClick={() => setActiveTab('generate')}
         >
-          🖼️ Generate Image
+          <ImageIcon className="w-4 h-4" /> Generate Image
         </button>
         <button 
-          className={activeTab === 'story' ? 'active' : ''} 
+          className={`flex items-center gap-2 ${activeTab === 'story' ? 'active' : ''}`}
           onClick={() => setActiveTab('story')}
         >
-          📚 Story Explainer
+          <BookOpen className="w-4 h-4" /> Story Explainer
         </button>
         <button 
-          className={activeTab === 'analyze' ? 'active' : ''} 
+          className={`flex items-center gap-2 ${activeTab === 'analyze' ? 'active' : ''}`}
           onClick={() => setActiveTab('analyze')}
         >
-          👁️ Analyze Image
+          <Eye className="w-4 h-4" /> Analyze Image
         </button>
       </div>
 
@@ -418,7 +418,7 @@ const ImageGenerator = () => {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>🤖 AI Model:</label>
+                <label className="flex items-center gap-1"><Bot className="w-4 h-4" /> AI Model:</label>
                 <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="model-select">
                   {allModels.map(model => (
                     <option key={model.id} value={model.id}>
@@ -454,16 +454,16 @@ const ImageGenerator = () => {
               <button 
                 onClick={generateImage} 
                 disabled={loading || !imagePrompt.trim()}
-                className="generate-btn"
+                className="generate-btn flex items-center justify-center gap-2"
               >
-                {loading ? '🔄 Generating...' : '🎨 Generate Image'}
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Generating...</> : <><Palette className="w-4 h-4" /> Generate Image</>}
               </button>
               {result && (
                 <button 
                   onClick={resetImageGeneration}
-                  className="reset-btn"
+                  className="reset-btn flex items-center justify-center gap-2"
                 >
-                  🔄 Generate Another
+                  <RefreshCw className="w-4 h-4" /> Generate Another
                 </button>
               )}
             </div>
@@ -472,7 +472,7 @@ const ImageGenerator = () => {
 
         {activeTab === 'story' && (
           <div className="tab-content">
-            <h3>📚 Story Concept Explainer</h3>
+            <h3 className="flex items-center gap-2"><BookOpen className="w-5 h-5 text-blue-500" /> Story Concept Explainer</h3>
             <p className="subtitle">Generate step-by-step visual explanations for any concept</p>
             
             <div className="form-group">
@@ -508,7 +508,7 @@ const ImageGenerator = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label>🤖 AI Model:</label>
+                <label className="flex items-center gap-1"><Bot className="w-4 h-4" /> AI Model:</label>
                 <select value={storyModel} onChange={(e) => setStoryModel(e.target.value)} className="model-select">
                   {allModels.map(model => (
                     <option key={model.id} value={model.id}>
@@ -523,16 +523,16 @@ const ImageGenerator = () => {
               <button 
                 onClick={generateStoryExplanation} 
                 disabled={isGeneratingStory || !storyConcept.trim()}
-                className="generate-btn"
+                className="generate-btn flex items-center justify-center gap-2"
               >
-                {isGeneratingStory ? `🔄 Generating Step ${currentStep}/${numberOfSteps}...` : '📚 Generate Story Explanation'}
+                {isGeneratingStory ? <><RefreshCw className="w-4 h-4 animate-spin" /> Generating Step {currentStep}/{numberOfSteps}...</> : <><BookOpen className="w-4 h-4" /> Generate Story Explanation</>}
               </button>
               {storyImages.length > 0 && !isGeneratingStory && (
                 <button 
                   onClick={resetStoryExplainer}
-                  className="reset-btn"
+                  className="reset-btn flex items-center justify-center gap-2"
                 >
-                  🔄 Generate Another Story
+                  <RefreshCw className="w-4 h-4" /> Generate Another Story
                 </button>
               )}
             </div>
@@ -540,9 +540,9 @@ const ImageGenerator = () => {
             {/* Story Images Display */}
             {storyImages.length > 0 && (
               <div className="story-results">
-                <h4>🌟 Visual Story: {storyConcept}</h4>
-                <p className="story-model-info">🤖 Generated with model: <strong>{storyModel}</strong></p>
-                <p className="click-hint">💡 Click any image to view full size & download</p>
+                <h4 className="flex items-center gap-2"><ImageIcon className="w-5 h-5 text-yellow-500" /> Visual Story: {storyConcept}</h4>
+                <p className="story-model-info flex items-center gap-1"><Bot className="w-4 h-4" /> Generated with model: <strong>{storyModel}</strong></p>
+                <p className="click-hint flex items-center gap-1"><Search className="w-4 h-4" /> Click any image to view full size & download</p>
                 <div className="story-grid">
                   {storyImages.map((step, index) => (
                     <div key={index} className="story-step">
@@ -571,7 +571,7 @@ const ImageGenerator = () => {
 
         {activeTab === 'analyze' && (
           <div className="tab-content">
-            <h3>🔍 Analyze Image with AI Vision</h3>
+            <h3 className="flex items-center gap-2"><Search className="w-5 h-5 text-blue-500" /> Analyze Image with AI Vision</h3>
             <p className="subtitle">Upload an image to get AI-powered analysis</p>
             
             <div className="form-group">
@@ -588,11 +588,11 @@ const ImageGenerator = () => {
                   {analysisImagePreview ? (
                     <div className="preview-container">
                       <img src={analysisImagePreview} alt="Preview" className="image-preview" />
-                      <span className="change-text">📷 Click to change image</span>
+                      <span className="change-text flex items-center gap-1 justify-center"><ImageIcon className="w-4 h-4" /> Click to change image</span>
                     </div>
                   ) : (
                     <div className="upload-placeholder">
-                      <span className="upload-icon">📷</span>
+                      <span className="upload-icon"><ImageIcon className="w-8 h-8 text-gray-400" /></span>
                       <span>Click to upload an image</span>
                       <span className="upload-hint">Supports JPG, PNG, GIF, WebP</span>
                     </div>
@@ -615,16 +615,16 @@ const ImageGenerator = () => {
               <button 
                 onClick={analyzeImage} 
                 disabled={loading || !analysisImagePreview}
-                className="generate-btn"
+                className="generate-btn flex items-center justify-center gap-2"
               >
-                {loading ? '🔄 Analyzing...' : '👁️ Analyze Image'}
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Analyzing...</> : <><Eye className="w-4 h-4" /> Analyze Image</>}
               </button>
               {result && result.analysis && (
                 <button 
                   onClick={resetImageAnalysis}
-                  className="reset-btn"
+                  className="reset-btn flex items-center justify-center gap-2"
                 >
-                  🔄 Analyze Another
+                  <RefreshCw className="w-4 h-4" /> Analyze Another
                 </button>
               )}
             </div>
@@ -632,14 +632,15 @@ const ImageGenerator = () => {
         )}
 
         {error && (
-          <div className="error-message">
-            <strong>❌ Error:</strong> {error}
+          <div className="error-message flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 p-4 rounded-lg">
+            <XCircle className="w-5 h-5 flex-shrink-0" />
+            <span><strong>Error:</strong> {error}</span>
           </div>
         )}
 
         {result && (
           <div className="result-section">
-            <h3>✅ Result</h3>
+            <h3 className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-green-500" /> Result</h3>
             
             {result.image_url && (
               <div className="image-result">
@@ -651,9 +652,9 @@ const ImageGenerator = () => {
                   title="Click to view full size"
                 />
                 <div className="image-info">
-                  <p className="model-badge"><strong>🤖 Model Used:</strong> <span className="model-name">{result.model}</span></p>
+                  <p className="model-badge flex items-center gap-1"><strong><Bot className="w-4 h-4 inline" /> Model Used:</strong> <span className="model-name">{result.model}</span></p>
                   {result.revised_prompt && (
-                    <p><strong>📝 Prompt:</strong> {result.revised_prompt}</p>
+                    <p className="flex items-start gap-1"><strong><BookOpen className="w-4 h-4 inline mt-1" /> Prompt:</strong> {result.revised_prompt}</p>
                   )}
                   {result.metadata && (
                     <div className="metadata">
@@ -676,7 +677,7 @@ const ImageGenerator = () => {
                   </div>
                 )}
                 <div className="analysis-content">
-                  <h4>🔍 Analysis Result</h4>
+                  <h4 className="flex items-center gap-2"><Search className="w-5 h-5 text-blue-500" /> Analysis Result</h4>
                   <div className="analysis-text">{result.analysis}</div>
                   <p className="model-info"><strong>Model:</strong> {result.model}</p>
                 </div>
@@ -702,18 +703,18 @@ const ImageGenerator = () => {
                 className="lightbox-image"
               />
             </div>
-            <div className="lightbox-controls">
-              <button onClick={zoomOut} disabled={zoomLevel <= 0.5} title="Zoom Out">
-                🔍➖
+            <div className="lightbox-controls flex items-center justify-center gap-4 mt-4">
+              <button onClick={zoomOut} disabled={zoomLevel <= 0.5} title="Zoom Out" className="p-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 disabled:opacity-50 flex items-center justify-center">
+                <ZoomOut className="w-5 h-5" />
               </button>
-              <button onClick={resetZoom} title="Reset Zoom">
+              <button onClick={resetZoom} title="Reset Zoom" className="px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700">
                 {Math.round(zoomLevel * 100)}%
               </button>
-              <button onClick={zoomIn} disabled={zoomLevel >= 3} title="Zoom In">
-                🔍➕
+              <button onClick={zoomIn} disabled={zoomLevel >= 3} title="Zoom In" className="p-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 disabled:opacity-50 flex items-center justify-center">
+                <ZoomIn className="w-5 h-5" />
               </button>
-              <button onClick={downloadImage} className="download-btn" title="Download Image">
-                ⬇️ Download
+              <button onClick={downloadImage} className="download-btn flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700" title="Download Image">
+                <Download className="w-4 h-4" /> Download
               </button>
             </div>
           </div>

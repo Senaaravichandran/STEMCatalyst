@@ -281,77 +281,78 @@ const ProblemSolverView = () => {
 
           {/* Conversation Messages */}
           {conversations.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div key={msg.id} className={`flex w-full ${msg.type === 'user' ? 'justify-end' : 'justify-start'} mb-6`}>
               {msg.type === 'user' ? (
                 <div className="max-w-3xl">
-                  <div className="bg-blue-600 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-sm">
+                  <div className="bg-gray-100 text-gray-900 rounded-3xl px-5 py-3 shadow-sm text-base">
                     <p className="whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                  <div className="flex items-center justify-end mt-1 space-x-2 text-xs text-gray-400">
-                    <span>{msg.subject}</span>
-                    <span>•</span>
-                    <span>{msg.timestamp.toLocaleTimeString()}</span>
                   </div>
                 </div>
               ) : msg.type === 'error' ? (
-                <div className="max-w-4xl w-full">
-                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="max-w-4xl w-full flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-1">
+                    <AlertCircle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div className="flex-1 text-red-600 text-base py-1">
                     <p className="font-medium">Error</p>
-                    <p className="text-sm">{msg.content}</p>
+                    <p>{msg.content}</p>
                   </div>
                 </div>
               ) : (
-                <div className="max-w-4xl w-full">
-                  <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-6 py-5 shadow-sm">
+                <div className="max-w-4xl w-full flex gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 overflow-hidden border border-gray-200">
+                    <Brain className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1 w-0">
                     {msg.content.type === 'image' ? (
-                      <div className="space-y-3">
+                      <div className="space-y-3 mt-1">
                         {/* Image Container with Loading State */}
-                        <div className="relative min-h-[300px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
+                        <div className="relative min-h-[300px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden border border-gray-200">
                           {/* Loading overlay - shows until image loads */}
                           <div className="image-loading-overlay absolute inset-0 flex flex-col items-center justify-center z-10 bg-gradient-to-br from-blue-50 to-indigo-100">
                             <div className="relative">
-                              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                              <Image className="absolute inset-0 m-auto h-6 w-6 text-blue-600" />
+                              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                              <Image className="absolute inset-0 m-auto h-5 w-5 text-blue-600" />
                             </div>
                             <p className="mt-4 text-sm font-medium text-blue-600 animate-pulse">Generating image...</p>
-                            <p className="mt-1 text-xs text-gray-500">This may take a few seconds</p>
                           </div>
                           {/* Actual Image */}
                           <img 
                             src={msg.content.imageUrl} 
                             alt={msg.content.revisedPrompt}
-                            className="w-full rounded-lg shadow-md relative z-20"
+                            className="w-full rounded-lg shadow-sm relative z-20"
                             onLoad={(e) => {
-                              // Hide loading overlay when image loads
                               const overlay = e.target.parentElement.querySelector('.image-loading-overlay');
                               if (overlay) overlay.style.display = 'none';
                             }}
                           />
                         </div>
-                        {/* Enhanced prompt text - always below */}
                         {msg.content.revisedPrompt && (
-                          <p className="text-sm text-gray-500 italic">
-                            Enhanced: {msg.content.revisedPrompt}
+                          <p className="text-sm text-gray-500 italic px-2">
+                            {msg.content.revisedPrompt}
                           </p>
                         )}
                       </div>
                     ) : (
-                      <SolutionRenderer solution={msg.content.solution} />
+                      <div className="text-base text-gray-800 leading-relaxed overflow-hidden py-1">
+                        <SolutionRenderer solution={msg.content.solution} />
+                      </div>
                     )}
-                  </div>
-                  <div className="flex items-center mt-2 space-x-2">
-                    <button 
-                      onClick={() => handleCopy(msg.content.solution || msg.content.revisedPrompt)}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </button>
-                    <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Download className="h-4 w-4" />
-                    </button>
-                    <span className="text-xs text-gray-400">
-                      {msg.timestamp.toLocaleTimeString()}
-                    </span>
+                    <div className="flex items-center mt-3 space-x-1">
+                      <button 
+                        onClick={() => handleCopy(msg.content.solution || msg.content.revisedPrompt)}
+                        className="p-1.5 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                        title="Copy text"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                      <button 
+                        className="p-1.5 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                        title="Download"
+                      >
+                        <Download className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -360,29 +361,31 @@ const ProblemSolverView = () => {
 
           {/* Loading Indicator */}
           {loading && (
-            <div className="flex justify-start">
-              <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-5 py-4 shadow-sm">
-                <div className="flex items-center space-x-3">
-                  {mode === 'generate-image' ? (
-                    <>
-                      <div className="relative">
-                        <div className="w-8 h-8 border-3 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
-                        <Image className="absolute inset-0 m-auto h-4 w-4 text-purple-600" />
-                      </div>
-                      <div>
-                        <span className="text-gray-700 font-medium">Generating image...</span>
-                        <p className="text-xs text-gray-400">Creating your {subject} visualization</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                      <div>
-                        <span className="text-gray-700 font-medium">Solving problem...</span>
-                        <p className="text-xs text-gray-400">Analyzing your {subject} question</p>
-                      </div>
-                    </>
-                  )}
+            <div className="flex w-full justify-start mb-6">
+              <div className="max-w-4xl w-full flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 overflow-hidden border border-gray-200">
+                  <Brain className="w-5 h-5 text-blue-600 animate-pulse" />
+                </div>
+                <div className="flex-1 py-1">
+                  <div className="flex items-center space-x-3">
+                    {mode === 'generate-image' ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin text-purple-600" />
+                        <div>
+                          <span className="text-gray-700 font-medium">Generating image...</span>
+                          <p className="text-xs text-gray-400">Creating your {subject} visualization</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                        <div>
+                          <span className="text-gray-700 font-medium">Solving problem...</span>
+                          <p className="text-xs text-gray-400">Analyzing your {subject} question</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
