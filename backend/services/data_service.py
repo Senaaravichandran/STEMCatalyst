@@ -246,3 +246,13 @@ class DataService:
             logger.error(f"Error getting context: {str(e)}")
         
         return "\n".join(context_parts)
+        
+    def get_stats(self) -> Dict[str, Any]:
+        """Get statistics about loaded data"""
+        stats = {
+            "total_datasets_loaded": len(self.loaded_data),
+            "datasets": {}
+        }
+        for name, data in self.loaded_data.items():
+            stats["datasets"][name] = len(data) if isinstance(data, list) else 1
+        return stats

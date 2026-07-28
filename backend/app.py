@@ -55,7 +55,7 @@ def create_app():
             logger.info(f"Request data: {request.get_json()}")
     
     # Register blueprints
-    app.register_blueprint(api_bp)
+    app.register_blueprint(api_bp, url_prefix='/api')
     
     # Initialize services
     app.ai_service = AIService()
