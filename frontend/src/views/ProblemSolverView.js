@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Download, Copy, Brain, Image, FlaskConical, Calculator, Dna, Code, ChevronUp, Sparkles, Atom, Rocket, Lightbulb, Zap, Target, Award, RefreshCw } from 'lucide-react';
+import { Send, Loader2, Download, Copy, Brain, Image, FlaskConical, Calculator, Dna, Code, ChevronUp, Sparkles, Atom, Rocket, Lightbulb, Zap, Target, Award, RefreshCw, AlertCircle } from 'lucide-react';
 import VoiceInputButton from '../components/VoiceInputButton';
 import SolutionRenderer from '../components/SolutionRenderer';
 import { ApiService } from '../services/api';
